@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Pulso Brasil: indicadores econômicos brasileiros em um painel simples e transparente."
+    >
+
+    <title>Pulso Brasil</title>
+
+    <link
+        rel="stylesheet"
+        href="./css/style.css"
+    >
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.5.0/dist/chart.umd.min.js"
+        defer
+    ></script>
+
+    <script
+        src="./js/app.js"
+        defer
+    ></script>
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-content">
+            <a href="./" class="brand">
+                <span class="brand-symbol">PB</span>
+
+                <span class="brand-text">
+                    <strong>Pulso Brasil</strong>
+                    <small>Indicadores públicos</small>
+                </span>
+            </a>
+
+            <div class="status">
+                <span class="status-dot"></span>
+                <span id="statusText">Carregando dados...</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <span class="eyebrow">ECONOMIA BRASILEIRA</span>
+
+            <h1>
+                O Brasil em números,
+                <span>sem ruído.</span>
+            </h1>
+
+            <p>
+                Indicadores oficiais reunidos em um painel simples,
+                transparente e atualizado automaticamente.
+            </p>
+        </section>
+
+        <div
+            id="errorMessage"
+            class="error-message"
+            hidden
+        ></div>
+
+        <section
+            id="indicatorCards"
+            class="indicator-grid"
+            aria-label="Principais indicadores"
+        >
+            <article class="indicator-card skeleton"></article>
+            <article class="indicator-card skeleton"></article>
+            <article class="indicator-card skeleton"></article>
+        </section>
+
+        <section class="chart-panel">
+            <div class="chart-toolbar">
+                <div>
+                    <span class="section-label">
+                        EVOLUÇÃO HISTÓRICA
+                    </span>
+
+                    <h2 id="chartTitle">
+                        Carregando indicador...
+                    </h2>
+
+                    <p id="chartDescription"></p>
+                </div>
+
+                <div
+                    id="indicatorButtons"
+                    class="indicator-selector"
+                    aria-label="Selecionar indicador"
+                ></div>
+            </div>
+
+            <div class="chart-summary">
+                <div>
+                    <span>Valor mais recente</span>
+                    <strong id="chartValue">--</strong>
+                </div>
+
+                <div>
+                    <span>Data de referência</span>
+                    <strong id="chartDate">--</strong>
+                </div>
+
+                <div>
+                    <span>Fonte</span>
+                    <strong id="chartSource">--</strong>
+                </div>
+            </div>
+
+            <div class="period-selector">
+                <span>Período:</span>
+
+                <button type="button" data-months="3">
+                    3 meses
+                </button>
+
+                <button type="button" data-months="6">
+                    6 meses
+                </button>
+
+                <button
+                    type="button"
+                    data-months="12"
+                    class="active"
+                >
+                    1 ano
+                </button>
+
+                <button type="button" data-months="all">
+                    Tudo
+                </button>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="indicatorChart"></canvas>
+            </div>
+        </section>
+
+        <section class="methodology">
+            <div>
+                <span class="section-label">METODOLOGIA</span>
+
+                <h2>Dados com origem identificada</h2>
+            </div>
+
+            <p>
+                Os valores são obtidos de fontes públicas oficiais.
+                Cada indicador conserva sua unidade, periodicidade,
+                data de referência e endereço de origem.
+            </p>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div>
+            <strong>Pulso Brasil</strong>
+            <p>Projeto de integração e visualização de dados públicos.</p>
+        </div>
+
+        <div class="footer-update">
+            Última coleta:
+            <span id="lastUpdate">--</span>
+        </div>
+    </footer>
+</body>
+
+</html>
