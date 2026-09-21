@@ -1,7 +1,7 @@
 {
   "projeto": "Pulso Brasil",
-  "gerado_em": "2026-09-14T19:19:31.553527+00:00",
-  "total_indicadores": 3,
+  "gerado_em": "2026-09-14T19:58:01.261366+00:00",
+  "total_indicadores": 4,
   "indicadores": [
     {
       "id": "selic_meta",
@@ -2669,6 +2669,203 @@
         {
           "data": "2026-09-14",
           "valor": 5.1696
+        }
+      ]
+    },
+    {
+      "id": "taxa_desocupacao",
+      "codigo_fonte": 6381,
+      "rotulo_codigo": "SIDRA",
+      "nome": "Taxa de desocupação",
+      "descricao": "Percentual das pessoas de 14 anos ou mais que estavam desocupadas e procurando trabalho",
+      "unidade": "%",
+      "periodicidade": "trimestre móvel",
+      "fonte": "IBGE - PNAD Contínua",
+      "url_fonte": "https://servicodados.ibge.gov.br/api/v3/agregados/6381/periodos/-36/variaveis/4099?localidades=N1%5Ball%5D",
+      "ultimo_valor": 5.3,
+      "data_ultimo_valor": "2026-07-01",
+      "periodo_ultimo_valor": "mai-jun-jul/2026",
+      "total_registros": 36,
+      "valores": [
+        {
+          "data": "2023-08-01",
+          "valor": 7.8,
+          "periodo": "jun-jul-ago/2023"
+        },
+        {
+          "data": "2023-09-01",
+          "valor": 7.7,
+          "periodo": "jul-ago-set/2023"
+        },
+        {
+          "data": "2023-10-01",
+          "valor": 7.6,
+          "periodo": "ago-set-out/2023"
+        },
+        {
+          "data": "2023-11-01",
+          "valor": 7.5,
+          "periodo": "set-out-nov/2023"
+        },
+        {
+          "data": "2023-12-01",
+          "valor": 7.4,
+          "periodo": "out-nov-dez/2023"
+        },
+        {
+          "data": "2024-01-01",
+          "valor": 7.6,
+          "periodo": "nov-dez-jan/2024"
+        },
+        {
+          "data": "2024-02-01",
+          "valor": 7.8,
+          "periodo": "dez-jan-fev/2024"
+        },
+        {
+          "data": "2024-03-01",
+          "valor": 7.9,
+          "periodo": "jan-fev-mar/2024"
+        },
+        {
+          "data": "2024-04-01",
+          "valor": 7.5,
+          "periodo": "fev-mar-abr/2024"
+        },
+        {
+          "data": "2024-05-01",
+          "valor": 7.1,
+          "periodo": "mar-abr-mai/2024"
+        },
+        {
+          "data": "2024-06-01",
+          "valor": 6.9,
+          "periodo": "abr-mai-jun/2024"
+        },
+        {
+          "data": "2024-07-01",
+          "valor": 6.8,
+          "periodo": "mai-jun-jul/2024"
+        },
+        {
+          "data": "2024-08-01",
+          "valor": 6.6,
+          "periodo": "jun-jul-ago/2024"
+        },
+        {
+          "data": "2024-09-01",
+          "valor": 6.4,
+          "periodo": "jul-ago-set/2024"
+        },
+        {
+          "data": "2024-10-01",
+          "valor": 6.2,
+          "periodo": "ago-set-out/2024"
+        },
+        {
+          "data": "2024-11-01",
+          "valor": 6.1,
+          "periodo": "set-out-nov/2024"
+        },
+        {
+          "data": "2024-12-01",
+          "valor": 6.2,
+          "periodo": "out-nov-dez/2024"
+        },
+        {
+          "data": "2025-01-01",
+          "valor": 6.5,
+          "periodo": "nov-dez-jan/2025"
+        },
+        {
+          "data": "2025-02-01",
+          "valor": 6.8,
+          "periodo": "dez-jan-fev/2025"
+        },
+        {
+          "data": "2025-03-01",
+          "valor": 7.0,
+          "periodo": "jan-fev-mar/2025"
+        },
+        {
+          "data": "2025-04-01",
+          "valor": 6.6,
+          "periodo": "fev-mar-abr/2025"
+        },
+        {
+          "data": "2025-05-01",
+          "valor": 6.2,
+          "periodo": "mar-abr-mai/2025"
+        },
+        {
+          "data": "2025-06-01",
+          "valor": 5.8,
+          "periodo": "abr-mai-jun/2025"
+        },
+        {
+          "data": "2025-07-01",
+          "valor": 5.6,
+          "periodo": "mai-jun-jul/2025"
+        },
+        {
+          "data": "2025-08-01",
+          "valor": 5.6,
+          "periodo": "jun-jul-ago/2025"
+        },
+        {
+          "data": "2025-09-01",
+          "valor": 5.6,
+          "periodo": "jul-ago-set/2025"
+        },
+        {
+          "data": "2025-10-01",
+          "valor": 5.4,
+          "periodo": "ago-set-out/2025"
+        },
+        {
+          "data": "2025-11-01",
+          "valor": 5.2,
+          "periodo": "set-out-nov/2025"
+        },
+        {
+          "data": "2025-12-01",
+          "valor": 5.1,
+          "periodo": "out-nov-dez/2025"
+        },
+        {
+          "data": "2026-01-01",
+          "valor": 5.4,
+          "periodo": "nov-dez-jan/2026"
+        },
+        {
+          "data": "2026-02-01",
+          "valor": 5.8,
+          "periodo": "dez-jan-fev/2026"
+        },
+        {
+          "data": "2026-03-01",
+          "valor": 6.1,
+          "periodo": "jan-fev-mar/2026"
+        },
+        {
+          "data": "2026-04-01",
+          "valor": 5.8,
+          "periodo": "fev-mar-abr/2026"
+        },
+        {
+          "data": "2026-05-01",
+          "valor": 5.6,
+          "periodo": "mar-abr-mai/2026"
+        },
+        {
+          "data": "2026-06-01",
+          "valor": 5.4,
+          "periodo": "abr-mai-jun/2026"
+        },
+        {
+          "data": "2026-07-01",
+          "valor": 5.3,
+          "periodo": "mai-jun-jul/2026"
         }
       ]
     }

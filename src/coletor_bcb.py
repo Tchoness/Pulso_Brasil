@@ -13,6 +13,11 @@ URL_BASE_BCB = (
     "bcdata.sgs.{codigo}/dados"
 )
 
+URL_IBGE_DESEMPREGO = (
+    "https://servicodados.ibge.gov.br/api/v3/"
+    "agregados/6381/periodos/-36/variaveis/4099"
+)
+
 PASTA_PROJETO = Path(__file__).resolve().parent.parent
 ARQUIVO_SAIDA = PASTA_PROJETO / "data" / "data.json"
 
@@ -208,6 +213,160 @@ def coletar_serie(
         "valores": valores,
     }
 
+MESES_ABREVIADOS = [
+    "jan",
+    "fev",
+    "mar",
+    "abr",
+    "mai",
+    "jun",
+    "jul",
+    "ago",
+    "set",
+    "out",
+    "nov",
+    "dez",
+]
+
+
+def criar_nome_trimestre_movel(codigo_periodo: str) -> str:
+    """
+    Converte 202607 em mai-jun-jul/2026.
+    """
+
+    if len(codigo_periodo) != 6:
+        return codigo_periodo
+
+    ano = int(codigo_periodo[:4])
+    mes_final = int(codigo_periodo[4:6])
+
+    if mes_final < 1 or mes_final > 12:
+        return codigo_periodo
+
+    meses = []
+
+    for deslocamento in (2, 1, 0):
+        indice_absoluto = (
+            ano * 12 +
+            mes_final -
+            1 -
+            deslocamento
+        )
+
+        indice_mes = indice_absoluto % 12
+        meses.append(MESES_ABREVIADOS[indice_mes])
+
+    return f"{'-'.join(meses)}/{ano}"
+
+
+def coletar_taxa_desocupacao(
+    sessao: requests.Session,
+) -> dict:
+    """
+    Consulta a taxa de desocupação nacional na API
+    de Dados Agregados do IBGE.
+    """
+
+    logging.info(
+        "Consultando Taxa de desocupação - "
+        "SIDRA tabela 6381"
+    )
+
+    resposta = sessao.get(
+        URL_IBGE_DESEMPREGO,
+        params={
+            "localidades": "N1[all]",
+        },
+        timeout=(TIMEOUT_CONEXAO, TIMEOUT_RESPOSTA),
+    )
+
+    resposta.raise_for_status()
+
+    dados_api = resposta.json()
+
+    if not isinstance(dados_api, list) or not dados_api:
+        raise ValueError(
+            "O IBGE retornou uma resposta vazia ou inválida."
+        )
+
+    variavel = dados_api[0]
+    resultados = variavel.get("resultados", [])
+
+    valores_por_data = {}
+
+    for resultado in resultados:
+        series = resultado.get("series", [])
+
+        for serie in series:
+            localidade = serie.get("localidade", {})
+            nome_localidade = localidade.get("nome")
+
+            if nome_localidade != "Brasil":
+                continue
+
+            registros = serie.get("serie", {})
+
+            for codigo_periodo, valor_api in registros.items():
+                try:
+                    if len(codigo_periodo) != 6:
+                        continue
+
+                    ano = int(codigo_periodo[:4])
+                    mes = int(codigo_periodo[4:6])
+
+                    if mes < 1 or mes > 12:
+                        continue
+
+                    valor = converter_valor(valor_api)
+                    data_iso = f"{ano}-{mes:02d}-01"
+
+                    valores_por_data[data_iso] = {
+                        "data": data_iso,
+                        "valor": valor,
+                        "periodo": criar_nome_trimestre_movel(
+                            codigo_periodo
+                        ),
+                    }
+
+                except (ValueError, TypeError):
+                    logging.warning(
+                        "Registro inválido do IBGE ignorado: "
+                        "período=%s, valor=%s",
+                        codigo_periodo,
+                        valor_api,
+                    )
+
+    valores = sorted(
+        valores_por_data.values(),
+        key=lambda registro: registro["data"],
+    )
+
+    if not valores:
+        raise ValueError(
+            "Nenhum valor válido de desemprego foi encontrado."
+        )
+
+    ultimo = valores[-1]
+
+    return {
+        "id": "taxa_desocupacao",
+        "codigo_fonte": 6381,
+        "rotulo_codigo": "SIDRA",
+        "nome": "Taxa de desocupação",
+        "descricao": (
+            "Percentual das pessoas de 14 anos ou mais "
+            "que estavam desocupadas e procurando trabalho"
+        ),
+        "unidade": "%",
+        "periodicidade": "trimestre móvel",
+        "fonte": "IBGE - PNAD Contínua",
+        "url_fonte": resposta.url,
+        "ultimo_valor": ultimo["valor"],
+        "data_ultimo_valor": ultimo["data"],
+        "periodo_ultimo_valor": ultimo["periodo"],
+        "total_registros": len(valores),
+        "valores": valores,
+    }
 
 def gerar_arquivo_json() -> None:
     """
@@ -271,6 +430,55 @@ def gerar_arquivo_json() -> None:
             )
             logging.error(mensagem)
             erros.append(mensagem)
+
+    try:
+        indicador_desemprego = coletar_taxa_desocupacao(
+            sessao
+        )
+
+        indicadores.append(indicador_desemprego)
+
+        logging.info(
+            "Taxa de desocupação coletada: %s registros",
+            indicador_desemprego["total_registros"],
+        )
+
+    except requests.exceptions.Timeout:
+        mensagem = (
+            "Timeout ao consultar Taxa de desocupação no IBGE."
+        )
+        logging.error(mensagem)
+        erros.append(mensagem)
+
+    except requests.exceptions.ConnectionError as erro:
+        mensagem = (
+            "Erro de conexão ao consultar "
+            f"Taxa de desocupação no IBGE: {erro}"
+        )
+        logging.error(mensagem)
+        erros.append(mensagem)
+
+    except requests.exceptions.HTTPError as erro:
+        status = (
+            erro.response.status_code
+            if erro.response is not None
+            else "desconhecido"
+        )
+
+        mensagem = (
+            f"Erro HTTP {status} ao consultar "
+            "Taxa de desocupação no IBGE."
+        )
+        logging.error(mensagem)
+        erros.append(mensagem)
+
+    except (ValueError, KeyError, TypeError) as erro:
+        mensagem = (
+            "Erro ao processar Taxa de desocupação "
+            f"do IBGE: {erro}"
+        )
+        logging.error(mensagem)
+        erros.append(mensagem)
 
     documento = {
         "projeto": "Pulso Brasil",

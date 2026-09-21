@@ -209,9 +209,11 @@ button {
 
 .indicator-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 18px;
-
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(240px, 1fr)
+    );
+    gap: 24px;
     margin-bottom: 24px;
 }
 

@@ -20,6 +20,13 @@ const configuracoes = {
         fundo: "rgba(39, 101, 176, 0.12)",
         casasDecimais: 4,
         comparacao: "30 dias"
+    },
+
+    taxa_desocupacao: {
+        cor: "#7c3aed",
+        fundo: "rgba(124, 58, 237, 0.12)",
+        casasDecimais: 1,
+        comparacao: "dado anterior"
     }
 };
 
@@ -92,6 +99,11 @@ function renderizarCards() {
         .map(indicador => {
             const variacao = calcularVariacao(indicador);
             const ativo = indicador.id === estado.indicadorAtual;
+            const rotuloCodigo =
+                indicador.rotulo_codigo || "SGS";
+
+            const codigoFonte =
+                indicador.codigo_fonte || indicador.codigo_sgs;
 
             return `
                 <button
@@ -105,7 +117,7 @@ function renderizarCards() {
                         </span>
 
                         <span class="card-code">
-                            SGS ${indicador.codigo_sgs}
+                            ${rotuloCodigo} ${codigoFonte}
                         </span>
                     </div>
 
@@ -118,7 +130,7 @@ function renderizarCards() {
 
                     <div class="card-footer">
                         <span>
-                            ${formatarData(indicador.data_ultimo_valor)}
+                            ${formatarReferencia(indicador)}
                         </span>
 
                         <span class="card-change ${variacao.classe}">
@@ -241,7 +253,8 @@ function atualizarGrafico() {
     atualizarResumoGrafico(indicador);
 
     const labels = valores.map(registro => {
-        return formatarDataCurta(registro.data);
+        return registro.periodo || 
+        formatarDataCurta(registro.data);
     });
 
     const dados = valores.map(registro => registro.valor);
@@ -375,23 +388,27 @@ function atualizarGrafico() {
 
 
 function atualizarResumoGrafico(indicador) {
-    document.getElementById("chartTitle").textContent =
-        indicador.nome;
+    const titulo = document.getElementById("chartTitle");
+    const descricao = document.getElementById(
+        "chartDescription"
+    );
+    const valor = document.getElementById("chartValue");
+    const data = document.getElementById("chartDate");
+    const fonte = document.getElementById("chartSource");
 
-    document.getElementById("chartDescription").textContent =
-        indicador.descricao;
+    titulo.textContent = indicador.nome;
 
-    document.getElementById("chartValue").textContent =
-        formatarValor(
-            indicador.id,
-            indicador.ultimo_valor
-        );
+    descricao.textContent =
+        indicador.descricao || "Descrição não informada.";
 
-    document.getElementById("chartDate").textContent =
-        formatarData(indicador.data_ultimo_valor);
+    valor.textContent = formatarValor(
+        indicador.id,
+        indicador.ultimo_valor
+    );
 
-    document.getElementById("chartSource").textContent =
-        indicador.fonte;
+    data.textContent = formatarReferencia(indicador);
+
+    fonte.textContent = indicador.fonte;
 }
 
 
@@ -408,7 +425,7 @@ function calcularVariacao(indicador) {
     const ultimo = valores[valores.length - 1];
     let referencia;
 
-    if (indicador.id === "ipca_mensal") {
+    if (indicador.id === "ipca_mensal" || indicador.id === "taxa_desocupacao") {
         referencia = valores[valores.length - 2];
     } else {
         const dataUltimo = criarDataLocal(ultimo.data);
@@ -451,8 +468,11 @@ function calcularVariacao(indicador) {
                 4
             )} em 30 dias`;
     } else {
-        const periodo =
-            indicador.id === "ipca_mensal"
+        const comparaComAnterior =
+            indicador.id === "ipca_mensal" || 
+            indicador.id === "taxa_desocupacao";
+
+        const periodo = comparaComAnterior
                 ? "vs. anterior"
                 : "em 30 dias";
 
@@ -497,6 +517,13 @@ function criarDataLocal(dataIso) {
     return new Date(`${dataIso}T12:00:00`);
 }
 
+function formatarReferencia(indicador) {
+    if (indicador.periodo_ultimo_valor) {
+        return indicador.periodo_ultimo_valor;
+    }
+
+    return formatarData(indicador.data_ultimo_valor);
+}
 
 function formatarData(dataIso) {
     return criarDataLocal(dataIso).toLocaleDateString(
