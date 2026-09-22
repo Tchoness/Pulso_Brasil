@@ -1,0 +1,106 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Infraestrutura serverless do coletor Pulso Brasil
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures:
+      - arm64
+    MemorySize: 256
+    Timeout: 180
+    Environment:
+      Variables:
+        OBJECT_KEY: data/data.json
+        PUBLICAR_COM_ERROS: "false"
+        CACHE_CONTROL: public, max-age=300, must-revalidate
+    Tags:
+      Projeto: pulso-brasil
+
+Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: RemoverVersoesAntigas
+            Status: Enabled
+            NoncurrentVersionExpiration:
+              NoncurrentDays: 30
+      Tags:
+        - Key: Projeto
+          Value: pulso-brasil
+
+  ColetorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "${AWS::StackName}-coletor"
+      Description: Coleta indicadores do BCB e IBGE e publica o JSON no S3
+      CodeUri: src/
+      Handler: lambda_function.lambda_handler
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref DataBucket
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Sid: PublicarDataJson
+              Effect: Allow
+              Action:
+                - s3:PutObject
+              Resource: !Sub "${DataBucket.Arn}/data/data.json"
+      Events:
+        ColetaDiaria:
+          Type: ScheduleV2
+          Properties:
+            Name: !Sub "${AWS::StackName}-coleta-diaria"
+            Description: Atualiza diariamente os indicadores do Pulso Brasil
+            ScheduleExpression: cron(0 6 * * ? *)
+            ScheduleExpressionTimezone: America/Sao_Paulo
+            State: ENABLED
+            FlexibleTimeWindow:
+              Mode: "OFF"
+            RetryPolicy:
+              MaximumRetryAttempts: 2
+              MaximumEventAgeInSeconds: 3600
+
+  ColetorLogGroup:
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${ColetorFunction}"
+      RetentionInDays: 7
+
+Outputs:
+  BucketName:
+    Description: Bucket privado que armazena o data.json
+    Value: !Ref DataBucket
+
+  DataObjectKey:
+    Description: Chave utilizada pelo JSON de indicadores
+    Value: data/data.json
+
+  LambdaFunctionName:
+    Description: Nome da função coletora
+    Value: !Ref ColetorFunction
+
+  LambdaFunctionArn:
+    Description: ARN da função coletora
+    Value: !GetAtt ColetorFunction.Arn

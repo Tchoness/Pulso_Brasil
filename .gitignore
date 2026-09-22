@@ -1,0 +1,13 @@
+@'
+.aws-sam/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+dist/
+data-lambda.json
+resposta-lambda.json
+.env
+Thumbs.db
+.DS_Store
+'@ | Set-Content .gitignore -Encoding utf8

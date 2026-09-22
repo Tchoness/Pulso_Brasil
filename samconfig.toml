@@ -1,0 +1,14 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "pulso-brasil"
+resolve_s3 = true
+s3_prefix = "pulso-brasil"
+region = "sa-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = false
+image_repositories = []
+
+[default.global.parameters]
+region = "sa-east-1"
