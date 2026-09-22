@@ -1,57 +1,25 @@
 {
   "projeto": "Pulso Brasil",
-  "gerado_em": "2026-09-14T19:58:01.261366+00:00",
+  "gerado_em": "2026-09-22T14:27:48.376129+00:00",
   "total_indicadores": 4,
   "indicadores": [
     {
       "id": "selic_meta",
       "codigo_sgs": 432,
       "nome": "Meta Selic",
-      "descricao": "Meta da taxa Selic definida pelo Copom",
+      "descricao": "A taxa Selic é a taxa básica de juros da economia brasileira, funcionando como o \"preço\" do dinheiro no país. É o farol que guia todas as outras taxas de juros do Brasil, é definida a cada 45 dias pelo Banco Central através do Copom. Serve para controlar a inflação (aumento dos preços).",
       "unidade": "% ao ano",
       "periodicidade": "diária",
       "fonte": "Banco Central do Brasil",
-      "url_fonte": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=14%2F09%2F2025&dataFinal=14%2F09%2F2026",
+      "url_fonte": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados?formato=json&dataInicial=22%2F09%2F2025&dataFinal=22%2F09%2F2026",
       "periodo_consultado": {
-        "data_inicial": "2025-09-14",
-        "data_final": "2026-09-14"
+        "data_inicial": "2025-09-22",
+        "data_final": "2026-09-22"
       },
-      "ultimo_valor": 14.0,
-      "data_ultimo_valor": "2026-09-14",
+      "ultimo_valor": 13.75,
+      "data_ultimo_valor": "2026-09-22",
       "total_registros": 366,
       "valores": [
-        {
-          "data": "2025-09-14",
-          "valor": 15.0
-        },
-        {
-          "data": "2025-09-15",
-          "valor": 15.0
-        },
-        {
-          "data": "2025-09-16",
-          "valor": 15.0
-        },
-        {
-          "data": "2025-09-17",
-          "valor": 15.0
-        },
-        {
-          "data": "2025-09-18",
-          "valor": 15.0
-        },
-        {
-          "data": "2025-09-19",
-          "valor": 15.0
-        },
-        {
-          "data": "2025-09-20",
-          "valor": 15.0
-        },
-        {
-          "data": "2025-09-21",
-          "valor": 15.0
-        },
         {
           "data": "2025-09-22",
           "valor": 15.0
@@ -1483,6 +1451,38 @@
         {
           "data": "2026-09-14",
           "valor": 14.0
+        },
+        {
+          "data": "2026-09-15",
+          "valor": 14.0
+        },
+        {
+          "data": "2026-09-16",
+          "valor": 14.0
+        },
+        {
+          "data": "2026-09-17",
+          "valor": 13.75
+        },
+        {
+          "data": "2026-09-18",
+          "valor": 13.75
+        },
+        {
+          "data": "2026-09-19",
+          "valor": 13.75
+        },
+        {
+          "data": "2026-09-20",
+          "valor": 13.75
+        },
+        {
+          "data": "2026-09-21",
+          "valor": 13.75
+        },
+        {
+          "data": "2026-09-22",
+          "valor": 13.75
         }
       ]
     },
@@ -1490,14 +1490,14 @@
       "id": "ipca_mensal",
       "codigo_sgs": 433,
       "nome": "IPCA mensal",
-      "descricao": "Variação mensal do IPCA",
+      "descricao": "O IPCA mensal é o indicador oficial que mostra quanto os preços das coisas subiram ou caíram no Brasil ao longo de um mês específico. Ele é calculado pelo IBGE e reflete a variação média dos preços de uma cesta de produtos e serviços consumidos pelas famílias brasileiras.",
       "unidade": "% ao mês",
       "periodicidade": "mensal",
       "fonte": "Banco Central do Brasil / IBGE",
-      "url_fonte": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=15%2F09%2F2023&dataFinal=14%2F09%2F2026",
+      "url_fonte": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.433/dados?formato=json&dataInicial=23%2F09%2F2023&dataFinal=22%2F09%2F2026",
       "periodo_consultado": {
-        "data_inicial": "2023-09-15",
-        "data_final": "2026-09-14"
+        "data_inicial": "2023-09-23",
+        "data_final": "2026-09-22"
       },
       "ultimo_valor": -0.32,
       "data_ultimo_valor": "2026-08-01",
@@ -1653,39 +1653,19 @@
       "id": "dolar_compra",
       "codigo_sgs": 1,
       "nome": "Dólar comercial",
-      "descricao": "Taxa de câmbio de compra do dólar",
+      "descricao": "Pense nele como o preço do dólar no \"atacado\". Ele serve como a base de preço para o comércio internacional e grandes movimentações econômicas, sendo bem diferente do dólar turismo, que é o que você compra em casas de câmbio para viajar.",
       "unidade": "R$ por US$",
       "periodicidade": "diária",
       "fonte": "Banco Central do Brasil",
-      "url_fonte": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=14%2F09%2F2025&dataFinal=14%2F09%2F2026",
+      "url_fonte": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados?formato=json&dataInicial=22%2F09%2F2025&dataFinal=22%2F09%2F2026",
       "periodo_consultado": {
-        "data_inicial": "2025-09-14",
-        "data_final": "2026-09-14"
+        "data_inicial": "2025-09-22",
+        "data_final": "2026-09-22"
       },
-      "ultimo_valor": 5.1696,
-      "data_ultimo_valor": "2026-09-14",
+      "ultimo_valor": 5.1117,
+      "data_ultimo_valor": "2026-09-21",
       "total_registros": 251,
       "valores": [
-        {
-          "data": "2025-09-15",
-          "valor": 5.3208
-        },
-        {
-          "data": "2025-09-16",
-          "valor": 5.3096
-        },
-        {
-          "data": "2025-09-17",
-          "valor": 5.3011
-        },
-        {
-          "data": "2025-09-18",
-          "valor": 5.301
-        },
-        {
-          "data": "2025-09-19",
-          "valor": 5.3276
-        },
         {
           "data": "2025-09-22",
           "valor": 5.3457
@@ -2669,6 +2649,26 @@
         {
           "data": "2026-09-14",
           "valor": 5.1696
+        },
+        {
+          "data": "2026-09-15",
+          "valor": 5.149
+        },
+        {
+          "data": "2026-09-16",
+          "valor": 5.1527
+        },
+        {
+          "data": "2026-09-17",
+          "valor": 5.1521
+        },
+        {
+          "data": "2026-09-18",
+          "valor": 5.1575
+        },
+        {
+          "data": "2026-09-21",
+          "valor": 5.1117
         }
       ]
     },
