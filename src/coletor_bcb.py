@@ -29,7 +29,7 @@ SERIES = {
     "selic_meta": {
         "codigo": 432,
         "nome": "Meta Selic",
-        "descricao": "Meta da taxa Selic definida pelo Copom",
+        "descricao": "A taxa Selic é a taxa básica de juros da economia brasileira, funcionando como o \"preço\" do dinheiro no país. É o farol que guia todas as outras taxas de juros do Brasil, é definida a cada 45 dias pelo Banco Central através do Copom. Serve para controlar a inflação (aumento dos preços).",
         "unidade": "% ao ano",
         "periodicidade": "diária",
         "dias_historico": 365,
@@ -38,7 +38,7 @@ SERIES = {
     "ipca_mensal": {
         "codigo": 433,
         "nome": "IPCA mensal",
-        "descricao": "Variação mensal do IPCA",
+        "descricao": "O IPCA mensal é o indicador oficial que mostra quanto os preços das coisas subiram ou caíram no Brasil ao longo de um mês específico. Ele é calculado pelo IBGE e reflete a variação média dos preços de uma cesta de produtos e serviços consumidos pelas famílias brasileiras.",
         "unidade": "% ao mês",
         "periodicidade": "mensal",
         "dias_historico": 1095,
@@ -47,7 +47,7 @@ SERIES = {
     "dolar_compra": {
         "codigo": 1,
         "nome": "Dólar comercial",
-        "descricao": "Taxa de câmbio de compra do dólar",
+        "descricao": "Pense nele como o preço do dólar no \"atacado\". Ele serve como a base de preço para o comércio internacional e grandes movimentações econômicas, sendo bem diferente do dólar turismo, que é o que você compra em casas de câmbio para viajar.",
         "unidade": "R$ por US$",
         "periodicidade": "diária",
         "dias_historico": 365,
@@ -230,9 +230,6 @@ MESES_ABREVIADOS = [
 
 
 def criar_nome_trimestre_movel(codigo_periodo: str) -> str:
-    """
-    Converte 202607 em mai-jun-jul/2026.
-    """
 
     if len(codigo_periodo) != 6:
         return codigo_periodo
@@ -262,10 +259,6 @@ def criar_nome_trimestre_movel(codigo_periodo: str) -> str:
 def coletar_taxa_desocupacao(
     sessao: requests.Session,
 ) -> dict:
-    """
-    Consulta a taxa de desocupação nacional na API
-    de Dados Agregados do IBGE.
-    """
 
     logging.info(
         "Consultando Taxa de desocupação - "
@@ -368,9 +361,9 @@ def coletar_taxa_desocupacao(
         "valores": valores,
     }
 
-def gerar_arquivo_json() -> None:
+def gerar_documento() -> dict:
     """
-    Coleta todas as séries e gera o arquivo utilizado futuramente
+    Coleta todas as séries e monta o documento consumido
     pelo frontend.
     """
 
@@ -488,12 +481,24 @@ def gerar_arquivo_json() -> None:
         "erros": erros,
     }
 
-    ARQUIVO_SAIDA.parent.mkdir(
+    sessao.close()
+    return documento
+
+def salvar_json_local(
+    documento: dict,
+    caminho_saida: Path = ARQUIVO_SAIDA,
+) -> Path:
+    """
+    Salva o documento no disco para desenvolvimento local
+    e para o deploy estático atual.
+    """
+
+    caminho_saida.parent.mkdir(
         parents=True,
         exist_ok=True,
     )
 
-    with ARQUIVO_SAIDA.open(
+    with caminho_saida.open(
         mode="w",
         encoding="utf-8",
     ) as arquivo:
@@ -504,7 +509,13 @@ def gerar_arquivo_json() -> None:
             indent=2,
         )
 
-    logging.info("Arquivo gerado em: %s", ARQUIVO_SAIDA)
+    logging.info("Arquivo gerado em: %s", caminho_saida)
+    return caminho_saida
+
+def registrar_resumo(documento: dict) -> None:
+    """Registra no log o resultado consolidado da coleta."""
+
+    erros = documento.get("erros", [])
 
     if erros:
         logging.warning(
@@ -513,6 +524,20 @@ def gerar_arquivo_json() -> None:
         )
     else:
         logging.info("Coleta finalizada sem erros.")
+
+
+def gerar_arquivo_json() -> dict:
+    """
+    Executa o fluxo local completo.
+
+    Esta função mantém compatibilidade com o comando atual,
+    enquanto gerar_documento() poderá ser reutilizada pela Lambda.
+    """
+
+    documento = gerar_documento()
+    salvar_json_local(documento)
+    registrar_resumo(documento)
+    return documento
 
 
 if __name__ == "__main__":
