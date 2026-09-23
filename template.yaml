@@ -5,12 +5,12 @@ Description: Infraestrutura serverless do coletor Pulso Brasil
 Parameters:
   GitHubOwner:
     Type: String
-    Default: Tchoness
+    Default: "86631868"
     Description: Proprietario do repositorio GitHub autorizado a publicar o site
 
   GitHubRepository:
     Type: String
-    Default: Pulso_Brasil
+    Default: "1370456287"
     Description: Repositorio GitHub autorizado a publicar o site
 
 Globals:
@@ -82,7 +82,7 @@ Resources:
             Condition:
               StringEquals:
                 "token.actions.githubusercontent.com:aud": sts.amazonaws.com
-                "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubOwner}/${GitHubRepository}:ref:refs/heads/main"
+                "token.actions.githubusercontent.com:sub": "repo:Tchoness@86631868/Pulso_Brasil@1370456287:ref:refs/heads/main"
       Policies:
         - PolicyName: LerDataJson
           PolicyDocument:
