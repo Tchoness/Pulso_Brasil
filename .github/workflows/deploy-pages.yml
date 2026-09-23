@@ -1,0 +1,72 @@
+name: Publicar frontend
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    # 06:30 no horario de Brasilia, apos a coleta das 06:00.
+    - cron: "30 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+      pages: write
+
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v6
+
+      - name: Autenticar na AWS com OIDC
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_PAGES_ROLE_ARN }}
+          aws-region: sa-east-1
+
+      - name: Montar site estatico
+        shell: bash
+        env:
+          DATA_BUCKET: ${{ vars.AWS_DATA_BUCKET }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist/data
+          cp -R public/. dist/
+          aws s3 cp "s3://${DATA_BUCKET}/data/data.json" dist/data/data.json
+          test -s dist/index.html
+          test -s dist/data/data.json
+          touch dist/.nojekyll
+
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Enviar artefato do site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Publicar no GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -2,6 +2,17 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Infraestrutura serverless do coletor Pulso Brasil
 
+Parameters:
+  GitHubOwner:
+    Type: String
+    Default: Tchoness
+    Description: Proprietario do repositorio GitHub autorizado a publicar o site
+
+  GitHubRepository:
+    Type: String
+    Default: Pulso_Brasil
+    Description: Repositorio GitHub autorizado a publicar o site
+
 Globals:
   Function:
     Runtime: python3.13
@@ -18,6 +29,16 @@ Globals:
       Projeto: pulso-brasil
 
 Resources:
+  GitHubOidcProvider:
+    Type: AWS::IAM::OIDCProvider
+    Properties:
+      Url: https://token.actions.githubusercontent.com
+      ClientIdList:
+        - sts.amazonaws.com
+      Tags:
+        - Key: Projeto
+          Value: pulso-brasil
+
   DataBucket:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
@@ -43,6 +64,35 @@ Resources:
             Status: Enabled
             NoncurrentVersionExpiration:
               NoncurrentDays: 30
+      Tags:
+        - Key: Projeto
+          Value: pulso-brasil
+
+  GitHubPagesRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Permite ao GitHub Actions ler somente o JSON publicado pelo coletor
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Ref GitHubOidcProvider
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                "token.actions.githubusercontent.com:aud": sts.amazonaws.com
+                "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubOwner}/${GitHubRepository}:ref:refs/heads/main"
+      Policies:
+        - PolicyName: LerDataJson
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Sid: LerSomenteDataJson
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                Resource: !Sub "${DataBucket.Arn}/data/data.json"
       Tags:
         - Key: Projeto
           Value: pulso-brasil
@@ -104,3 +154,7 @@ Outputs:
   LambdaFunctionArn:
     Description: ARN da função coletora
     Value: !GetAtt ColetorFunction.Arn
+
+  GitHubPagesRoleArn:
+    Description: ARN da função IAM usada pelo GitHub Actions via OIDC
+    Value: !GetAtt GitHubPagesRole.Arn

@@ -1,4 +1,4 @@
-const DATA_URL = "../data/data.json";
+const DATA_URL = "./data/data.json";
 
 const configuracoes = {
     selic_meta: {
