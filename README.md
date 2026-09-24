@@ -78,7 +78,7 @@ PulsoBrasil/
 Clone o repositório e entre na pasta do projeto:
 
 ```powershell
-git clone https://github.com/Tchoness/Pulso_Brasil
+git clone <URL_DO_REPOSITORIO>
 cd PulsoBrasil
 ```
 
@@ -211,4 +211,6 @@ O painel apresenta dados objetivos e não atribui automaticamente resultados eco
 ## Autor
 
 Desenvolvido por **Caito Canal**.
+
+**Visite:** https://tchoness.github.io/Pulso_Brasil/
 

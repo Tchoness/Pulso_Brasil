@@ -5,13 +5,23 @@ Description: Infraestrutura serverless do coletor Pulso Brasil
 Parameters:
   GitHubOwner:
     Type: String
-    Default: "86631868"
+    Default: Tchoness
     Description: Proprietario do repositorio GitHub autorizado a publicar o site
+
+  GitHubOwnerId:
+    Type: String
+    Default: "86631868"
+    Description: ID imutavel do proprietario do repositorio no GitHub
 
   GitHubRepository:
     Type: String
-    Default: "1370456287"
+    Default: Pulso_Brasil
     Description: Repositorio GitHub autorizado a publicar o site
+
+  GitHubRepositoryId:
+    Type: String
+    Default: "1370456287"
+    Description: ID imutavel do repositorio no GitHub
 
 Globals:
   Function:
@@ -68,6 +78,29 @@ Resources:
         - Key: Projeto
           Value: pulso-brasil
 
+  HistoryTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub "${AWS::StackName}-historico"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        - Key: Projeto
+          Value: pulso-brasil
+
   GitHubPagesRole:
     Type: AWS::IAM::Role
     Properties:
@@ -82,7 +115,7 @@ Resources:
             Condition:
               StringEquals:
                 "token.actions.githubusercontent.com:aud": sts.amazonaws.com
-                "token.actions.githubusercontent.com:sub": "repo:Tchoness@86631868/Pulso_Brasil@1370456287:ref:refs/heads/main"
+                "token.actions.githubusercontent.com:sub": !Sub "repo:${GitHubOwner}@${GitHubOwnerId}/${GitHubRepository}@${GitHubRepositoryId}:ref:refs/heads/main"
       Policies:
         - PolicyName: LerDataJson
           PolicyDocument:
@@ -107,6 +140,7 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: !Ref DataBucket
+          HISTORY_TABLE_NAME: !Ref HistoryTable
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -115,6 +149,12 @@ Resources:
               Action:
                 - s3:PutObject
               Resource: !Sub "${DataBucket.Arn}/data/data.json"
+            - Sid: GravarHistoricoDynamoDB
+              Effect: Allow
+              Action:
+                - dynamodb:BatchWriteItem
+                - dynamodb:PutItem
+              Resource: !GetAtt HistoryTable.Arn
       Events:
         ColetaDiaria:
           Type: ScheduleV2
@@ -158,3 +198,7 @@ Outputs:
   GitHubPagesRoleArn:
     Description: ARN da função IAM usada pelo GitHub Actions via OIDC
     Value: !GetAtt GitHubPagesRole.Arn
+
+  HistoryTableName:
+    Description: Tabela DynamoDB que armazena o historico das coletas
+    Value: !Ref HistoryTable
