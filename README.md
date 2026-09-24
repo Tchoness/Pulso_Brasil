@@ -78,7 +78,7 @@ PulsoBrasil/
 Clone o repositório e entre na pasta do projeto:
 
 ```powershell
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/Tchoness/Pulso_Brasil
 cd PulsoBrasil
 ```
 
