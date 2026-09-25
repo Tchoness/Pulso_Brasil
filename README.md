@@ -167,18 +167,29 @@ O coletor implementa:
 
 Se uma fonte falhar, os indicadores coletados com sucesso ainda podem ser gravados.
 
+## Etapas concluídas
+
+- [x] Adicionar a taxa de desocupação do IBGE.
+- [x] Adaptar o coletor para AWS Lambda.
+- [x] Agendar a coleta diária com EventBridge Scheduler.
+- [x] Publicar o snapshot `data.json` em um bucket S3 privado.
+- [x] Armazenar o histórico das coletas no DynamoDB.
+- [x] Publicar o frontend no GitHub Pages.
+- [x] Configurar autenticação GitHub Actions → AWS com OIDC.
+- [x] Disparar o GitHub Actions automaticamente após cada coleta.
+- [x] Restringir o acesso público direto ao bucket S3.
+- [x] Configurar retenção dos logs da Lambda por sete dias.
+- [x] Documentar a infraestrutura com AWS SAM e CloudFormation.
+
 ## Próximas etapas
 
-- [ ] Adicionar novos indicadores do IBGE.
-- [ ] Armazenar o histórico no DynamoDB.
-- [ ] Adaptar o coletor para AWS Lambda.
-- [ ] Agendar atualizações com EventBridge Scheduler.
-- [ ] Publicar o frontend e o JSON no S3.
-- [ ] Distribuir o conteúdo com CloudFront.
-- [ ] Restringir o acesso direto ao bucket S3.
-- [ ] Configurar monitoramento, retenção de logs e orçamento AWS.
-- [ ] Adicionar testes automatizados.
-- [ ] Documentar a infraestrutura como código.
+- [ ] Adicionar orientações educativas sobre o cenário econômico.
+- [ ] Registrar no DynamoDB o histórico das orientações exibidas.
+- [ ] Adicionar novos indicadores econômicos e sociais do IBGE.
+- [ ] Configurar alarmes no CloudWatch para falhas de coleta e publicação.
+- [ ] Configurar um orçamento e alertas de custos na AWS.
+- [ ] Adicionar testes automatizados para o coletor e a Lambda.
+- [ ] Monitorar e documentar a renovação do token do GitHub.
 
 ## Arquitetura planejada na AWS
 
@@ -213,4 +224,3 @@ O painel apresenta dados objetivos e não atribui automaticamente resultados eco
 Desenvolvido por **Caito Canal**.
 
 **Visite:** https://tchoness.github.io/Pulso_Brasil/
-

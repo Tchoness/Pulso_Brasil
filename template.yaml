@@ -23,6 +23,11 @@ Parameters:
     Default: "1370456287"
     Description: ID imutavel do repositorio no GitHub
 
+  GitHubTokenParameterName:
+    Type: String
+    Default: /pulso-brasil/github/actions-token
+    Description: Nome do parametro SecureString com o token do GitHub
+
 Globals:
   Function:
     Runtime: python3.13
@@ -141,6 +146,10 @@ Resources:
         Variables:
           BUCKET_NAME: !Ref DataBucket
           HISTORY_TABLE_NAME: !Ref HistoryTable
+          GITHUB_TOKEN_PARAMETER_NAME: !Ref GitHubTokenParameterName
+          GITHUB_REPOSITORY: !Sub "${GitHubOwner}/${GitHubRepository}"
+          GITHUB_WORKFLOW_FILE: deploy-pages.yml
+          GITHUB_WORKFLOW_REF: main
       Policies:
         - Version: "2012-10-17"
           Statement:
@@ -155,6 +164,11 @@ Resources:
                 - dynamodb:BatchWriteItem
                 - dynamodb:PutItem
               Resource: !GetAtt HistoryTable.Arn
+            - Sid: LerTokenGitHubNoParameterStore
+              Effect: Allow
+              Action:
+                - ssm:GetParameter
+              Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${GitHubTokenParameterName}"
       Events:
         ColetaDiaria:
           Type: ScheduleV2

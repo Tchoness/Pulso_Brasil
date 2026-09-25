@@ -1,8 +1,11 @@
 import json
 import logging
 import os
+import time
 from decimal import Decimal
 from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
@@ -15,6 +18,8 @@ logger.setLevel(logging.INFO)
 
 CHAVE_PADRAO = "data/data.json"
 CACHE_CONTROL_PADRAO = "public, max-age=300, must-revalidate"
+GITHUB_API_VERSION = "2026-03-10"
+STATUS_GITHUB_ACEITOS = {200, 204}
 
 
 class DocumentoInvalidoError(RuntimeError):
@@ -217,11 +222,155 @@ def gravar_historico_dynamodb(
     return len(itens)
 
 
+def obter_token_github(nome_parametro: str) -> str:
+    """Obtém o token criptografado no Parameter Store."""
+
+    cliente_ssm = boto3.client("ssm")
+
+    try:
+        resposta = cliente_ssm.get_parameter(
+            Name=nome_parametro,
+            WithDecryption=True,
+        )
+    except (BotoCoreError, ClientError) as erro:
+        logger.exception(
+            "Não foi possível obter o token do GitHub no Parameter Store."
+        )
+        raise RuntimeError(
+            "Falha ao obter o token do GitHub."
+        ) from erro
+
+    token = resposta.get("Parameter", {}).get("Value", "").strip()
+
+    if not token:
+        raise RuntimeError(
+            "O parâmetro do token do GitHub está vazio."
+        )
+
+    return token
+
+
+def disparar_workflow_github(
+    token: str,
+    repositorio: str,
+    arquivo_workflow: str,
+    referencia: str,
+    tentativas: int = 3,
+) -> dict[str, Any]:
+    """Dispara o workflow do GitHub Pages após publicar o JSON."""
+
+    url = (
+        f"https://api.github.com/repos/{repositorio}/actions/"
+        f"workflows/{arquivo_workflow}/dispatches"
+    )
+    corpo = json.dumps({"ref": referencia}).encode("utf-8")
+    ultimo_erro: Exception | None = None
+
+    for tentativa in range(1, tentativas + 1):
+        requisicao = Request(
+            url=url,
+            data=corpo,
+            method="POST",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+                "User-Agent": "PulsoBrasil-Lambda/1.0",
+                "X-GitHub-Api-Version": GITHUB_API_VERSION,
+            },
+        )
+
+        try:
+            with urlopen(requisicao, timeout=15) as resposta:
+                status = resposta.status
+                conteudo = resposta.read().decode("utf-8")
+
+                if status not in STATUS_GITHUB_ACEITOS:
+                    raise RuntimeError(
+                        f"O GitHub respondeu com status {status}."
+                    )
+
+                dados_resposta = {}
+
+                if conteudo.strip():
+                    try:
+                        dados_resposta = json.loads(conteudo)
+                    except json.JSONDecodeError:
+                        logger.warning(
+                            "GitHub aceitou o disparo, mas retornou "
+                            "um corpo não reconhecido."
+                        )
+
+                logger.info(
+                    "Workflow %s disparado no GitHub. status=%s",
+                    arquivo_workflow,
+                    status,
+                )
+
+                return {
+                    "status_code": status,
+                    "workflow_run_id": dados_resposta.get(
+                        "workflow_run_id"
+                    ),
+                    "workflow_run_url": dados_resposta.get("html_url"),
+                }
+
+        except HTTPError as erro:
+            ultimo_erro = erro
+            erro_temporario = erro.code in {
+                408,
+                429,
+                500,
+                502,
+                503,
+                504,
+            }
+
+            if not erro_temporario or tentativa == tentativas:
+                logger.exception(
+                    "GitHub recusou o disparo do workflow. status=%s",
+                    erro.code,
+                )
+                break
+
+        except (URLError, TimeoutError, RuntimeError) as erro:
+            ultimo_erro = erro
+
+            if tentativa == tentativas:
+                logger.exception(
+                    "Falha de comunicação ao disparar o workflow do GitHub."
+                )
+                break
+
+        espera = 2 ** (tentativa - 1)
+        logger.warning(
+            "Nova tentativa de disparo do GitHub em %s segundo(s).",
+            espera,
+        )
+        time.sleep(espera)
+
+    raise RuntimeError(
+        "Não foi possível disparar o workflow do GitHub."
+    ) from ultimo_erro
+
+
 def lambda_handler(event: dict, context: Any) -> dict[str, Any]:
     """Ponto de entrada executado pela AWS Lambda."""
 
     nome_bucket = obter_variavel_obrigatoria("BUCKET_NAME")
     nome_tabela = obter_variavel_obrigatoria("HISTORY_TABLE_NAME")
+    nome_parametro_token = obter_variavel_obrigatoria(
+        "GITHUB_TOKEN_PARAMETER_NAME"
+    )
+    repositorio_github = obter_variavel_obrigatoria(
+        "GITHUB_REPOSITORY"
+    )
+    arquivo_workflow = obter_variavel_obrigatoria(
+        "GITHUB_WORKFLOW_FILE"
+    )
+    referencia_workflow = obter_variavel_obrigatoria(
+        "GITHUB_WORKFLOW_REF"
+    )
     chave_objeto = os.getenv("OBJECT_KEY", CHAVE_PADRAO).strip()
     publicar_com_erros = obter_booleano("PUBLICAR_COM_ERROS")
 
@@ -264,6 +413,14 @@ def lambda_handler(event: dict, context: Any) -> dict[str, Any]:
             "O site foi atualizado no S3, mas o histórico não foi gravado."
         )
 
+    token_github = obter_token_github(nome_parametro_token)
+    resultado_github = disparar_workflow_github(
+        token=token_github,
+        repositorio=repositorio_github,
+        arquivo_workflow=arquivo_workflow,
+        referencia=referencia_workflow,
+    )
+
     return {
         "status": "sucesso",
         "request_id": request_id,
@@ -273,6 +430,12 @@ def lambda_handler(event: dict, context: Any) -> dict[str, Any]:
         "history_table": nome_tabela,
         "history_saved": historico_gravado,
         "history_items": total_itens_historico,
+        "github_dispatch_sent": True,
+        "github_status_code": resultado_github["status_code"],
+        "github_workflow_run_id": resultado_github["workflow_run_id"],
+        "github_workflow_run_url": resultado_github[
+            "workflow_run_url"
+        ],
         "gerado_em": documento["gerado_em"],
         "total_indicadores": documento["total_indicadores"],
         "total_erros": len(documento["erros"]),

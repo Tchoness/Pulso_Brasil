@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  schedule:
-    # 06:30 no horario de Brasilia, apos a coleta das 06:00.
-    - cron: "30 9 * * *"
   workflow_dispatch:
 
 permissions:
