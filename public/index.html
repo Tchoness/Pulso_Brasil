@@ -16,6 +16,14 @@
 
     <title>Pulso Brasil</title>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
     <link
         rel="stylesheet"
         href="./css/style.css"
@@ -33,146 +41,305 @@
 </head>
 
 <body>
+    <a href="#mainContent" class="skip-link">
+        Ir para o conteúdo
+    </a>
+
     <header class="header">
         <div class="header-content">
-            <a href="./" class="brand">
-                <span class="brand-symbol">PB</span>
+            <a href="./" class="brand" aria-label="Pulso Brasil — Página inicial">
+                <span class="brand-symbol">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
 
                 <span class="brand-text">
                     <strong>Pulso Brasil</strong>
-                    <small>Indicadores públicos</small>
+                    <small>Inteligência econômica</small>
                 </span>
             </a>
 
-            <div class="status">
+            <nav class="navigation" aria-label="Navegação principal">
+                <a href="#indicadores">Indicadores</a>
+                <a href="#historico">Histórico</a>
+                <a href="#metodologia">Metodologia</a>
+            </nav>
+
+            <div class="status" aria-live="polite">
                 <span class="status-dot"></span>
                 <span id="statusText">Carregando dados...</span>
             </div>
         </div>
     </header>
 
-    <main class="container">
+    <main id="mainContent">
         <section class="hero">
-            <span class="eyebrow">ECONOMIA BRASILEIRA</span>
+            <div class="hero-background" aria-hidden="true"></div>
 
-            <h1>
-                O Brasil em números,
-                <span>sem ruído.</span>
-            </h1>
-
-            <p>
-                Indicadores oficiais reunidos em um painel simples,
-                transparente e atualizado automaticamente.
-            </p>
-        </section>
-
-        <div
-            id="errorMessage"
-            class="error-message"
-            hidden
-        ></div>
-
-        <section
-            id="indicatorCards"
-            class="indicator-grid"
-            aria-label="Principais indicadores"
-        >
-            <article class="indicator-card skeleton"></article>
-            <article class="indicator-card skeleton"></article>
-            <article class="indicator-card skeleton"></article>
-        </section>
-
-        <section class="chart-panel">
-            <div class="chart-toolbar">
-                <div>
-                    <span class="section-label">
-                        EVOLUÇÃO HISTÓRICA
+            <div class="hero-content">
+                <div class="hero-copy">
+                    <span class="eyebrow">
+                        DADOS PARA DECISÕES MELHORES
                     </span>
 
-                    <h2 id="chartTitle">
-                        Carregando indicador...
-                    </h2>
+                    <h1>
+                        Entenda o Brasil
+                        <span>antes de decidir.</span>
+                    </h1>
 
-                    <p id="chartDescription"></p>
+                    <p>
+                        Os principais indicadores econômicos do país,
+                        organizados em uma experiência simples, confiável
+                        e atualizada automaticamente.
+                    </p>
+
+                    <div class="hero-actions">
+                        <a href="#indicadores" class="primary-action">
+                            Ver indicadores
+
+                            <span aria-hidden="true">↘</span>
+                        </a>
+
+                        <a href="#metodologia" class="secondary-action">
+                            Como os dados são coletados
+                        </a>
+                    </div>
+                </div>
+
+                <aside class="hero-insight">
+                    <div class="insight-header">
+                        <span>VISÃO DO PRODUTO</span>
+
+                        <span class="live-label">
+                            <span></span>
+                            Dados atualizados
+                        </span>
+                    </div>
+
+                    <div class="insight-main">
+                        <span class="insight-kicker">Economia brasileira</span>
+
+                        <strong>
+                            Informação pública,
+                            <span>apresentada com clareza.</span>
+                        </strong>
+                    </div>
+
+                    <div class="insight-sources">
+                        <div>
+                            <span>Fonte monetária</span>
+                            <strong>Banco Central</strong>
+                        </div>
+
+                        <div>
+                            <span>Fonte estatística</span>
+                            <strong>IBGE</strong>
+                        </div>
+                    </div>
+
+                    <div class="insight-process">
+                        <span>Coleta</span>
+                        <i></i>
+                        <span>Validação</span>
+                        <i></i>
+                        <span>Publicação</span>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <div class="page-container">
+            <div
+                id="errorMessage"
+                class="error-message"
+                hidden
+            ></div>
+
+            <section id="indicadores" class="indicators-section">
+                <div class="section-heading">
+                    <div>
+                        <span class="section-label">PANORAMA ATUAL</span>
+
+                        <h2>Indicadores em destaque</h2>
+                    </div>
+
+                    <p>
+                        Uma leitura direta dos números que ajudam
+                        a explicar o momento econômico do país.
+                    </p>
                 </div>
 
                 <div
-                    id="indicatorButtons"
-                    class="indicator-selector"
-                    aria-label="Selecionar indicador"
-                ></div>
-            </div>
-
-            <div class="chart-summary">
-                <div>
-                    <span>Valor mais recente</span>
-                    <strong id="chartValue">--</strong>
-                </div>
-
-                <div>
-                    <span>Data de referência</span>
-                    <strong id="chartDate">--</strong>
-                </div>
-
-                <div>
-                    <span>Fonte</span>
-                    <strong id="chartSource">--</strong>
-                </div>
-            </div>
-
-            <div class="period-selector">
-                <span>Período:</span>
-
-                <button type="button" data-months="3">
-                    3 meses
-                </button>
-
-                <button type="button" data-months="6">
-                    6 meses
-                </button>
-
-                <button
-                    type="button"
-                    data-months="12"
-                    class="active"
+                    id="indicatorCards"
+                    class="indicator-grid"
+                    aria-label="Principais indicadores"
                 >
-                    1 ano
-                </button>
+                    <article class="indicator-card skeleton"></article>
+                    <article class="indicator-card skeleton"></article>
+                    <article class="indicator-card skeleton"></article>
+                </div>
+            </section>
 
-                <button type="button" data-months="all">
-                    Tudo
-                </button>
-            </div>
+            <section id="historico" class="chart-panel">
+                <div class="chart-topbar">
+                    <div class="chart-heading">
+                        <span class="section-label">
+                            SÉRIE HISTÓRICA
+                        </span>
 
-            <div class="chart-container">
-                <canvas id="indicatorChart"></canvas>
-            </div>
-        </section>
+                        <h2 id="chartTitle">
+                            Carregando indicador...
+                        </h2>
 
-        <section class="methodology">
-            <div>
-                <span class="section-label">METODOLOGIA</span>
+                        <p id="chartDescription"></p>
+                    </div>
 
-                <h2>Dados com origem identificada</h2>
-            </div>
+                    <div
+                        id="indicatorButtons"
+                        class="indicator-selector"
+                        aria-label="Selecionar indicador"
+                    ></div>
+                </div>
 
-            <p>
-                Os valores são obtidos de fontes públicas oficiais.
-                Cada indicador conserva sua unidade, periodicidade,
-                data de referência e endereço de origem.
-            </p>
-        </section>
+                <div class="chart-summary">
+                    <div>
+                        <span>Valor mais recente</span>
+                        <strong id="chartValue">--</strong>
+                    </div>
+
+                    <div>
+                        <span>Data de referência</span>
+                        <strong id="chartDate">--</strong>
+                    </div>
+
+                    <div>
+                        <span>Fonte oficial</span>
+                        <strong id="chartSource">--</strong>
+                    </div>
+                </div>
+
+                <div class="chart-toolbar">
+                    <span class="chart-toolbar-label">
+                        Intervalo de visualização
+                    </span>
+
+                    <div class="period-selector">
+                        <button type="button" data-months="3">
+                            3 meses
+                        </button>
+
+                        <button type="button" data-months="6">
+                            6 meses
+                        </button>
+
+                        <button
+                            type="button"
+                            data-months="12"
+                            class="active"
+                        >
+                            1 ano
+                        </button>
+
+                        <button type="button" data-months="all">
+                            Todo período
+                        </button>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="indicatorChart"></canvas>
+                </div>
+            </section>
+
+            <section id="metodologia" class="methodology">
+                <div class="methodology-intro">
+                    <span class="section-label">CONFIABILIDADE</span>
+
+                    <h2>
+                        Números que você pode verificar.
+                    </h2>
+
+                    <p>
+                        O Pulso Brasil organiza informações públicas
+                        sem alterar o significado original dos dados.
+                    </p>
+                </div>
+
+                <div class="methodology-list">
+                    <article>
+                        <span class="methodology-index">01</span>
+
+                        <div>
+                            <h3>Origem identificada</h3>
+
+                            <p>
+                                Cada indicador mantém a referência para
+                                sua fonte pública oficial.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <span class="methodology-index">02</span>
+
+                        <div>
+                            <h3>Coleta automatizada</h3>
+
+                            <p>
+                                A infraestrutura consulta, valida e publica
+                                os dados sem intervenção manual.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article>
+                        <span class="methodology-index">03</span>
+
+                        <div>
+                            <h3>Histórico preservado</h3>
+
+                            <p>
+                                As coletas são armazenadas para acompanhar
+                                a evolução dos indicadores.
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
     </main>
 
     <footer class="footer">
-        <div>
-            <strong>Pulso Brasil</strong>
-            <p>Projeto de integração e visualização de dados públicos.</p>
+        <div class="footer-content">
+            <div class="footer-main">
+                <a href="./" class="footer-brand">
+                    <span class="brand-symbol">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+
+                    <span>
+                        <strong>Pulso Brasil</strong>
+                        <small>Inteligência econômica</small>
+                    </span>
+                </a>
+
+                <p>
+                    Dados públicos transformados em informação clara.
+                </p>
+            </div>
+
+            <div class="footer-update">
+                <span>ÚLTIMA COLETA</span>
+                <strong id="lastUpdate">--</strong>
+            </div>
         </div>
 
-        <div class="footer-update">
-            Última coleta:
-            <span id="lastUpdate">--</span>
+        <div class="footer-bottom">
+            <span>Projeto de integração e visualização de dados públicos.</span>
+            <span>Brasil · 2026</span>
         </div>
     </footer>
 </body>
